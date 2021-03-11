@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="jquery-3.6.0.min.js">
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+	var num_divs = 0;
+	var time = new Date();
+	deleted_stuff = new Array();
+	selected_windows = new Array();
+	$(document).ready(function() {
+	$('#clock').append(time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }));
+	
+		$('#mk-div').click(function() {
+		//this line prints num_divs to taskbar.
+		//$('#taskbar').append('<div>'+num_divs+'</div>');
+			$('body').append('<div id="'+num_divs+'" class="selectable" style="margin:'+num_divs+'em;"><div class="window-titlebar">'+num_divs+'<i class="close-button fa fa-times"></i><br></div><p></p><p class="status">unselected</p></div>');
+			
+			num_divs += 1;
+		});
+	});
+	
+	$(document).on('click','#rm-div',function() {
+	$('.active').remove();
+		
+	for (i=0; i < num_divs; i++) {
+			if ($(this).attr('id') == i){
+			deleted_stuff.push(i);
+			}
+		  };
+	});
+	
+	$(document).on('click','#sel-all',function() {
+	$('.selectable').toggleClass('active');
+	
+	});
+	
+	$(document).on('click','.close-button',function() {
+	$(this).parent().parent().remove();
+	deleted_stuff.push($(this).parent().parent().attr('id'));
+	});
+	
+		  
+	
+	$(document).on('dblclick','#trashcan',function() {
+	// conditional checks if an element with that id is not already present
+		if ($('#trashcan-contents').length === 0) {
+	  $('body').append('<div id="trashcan-contents" class="selectable"><div class="window-titlebar">trashcan<i class="close-button fa fa-times"></i><br></div>Only windows closed with the X button will appear here.</br><ul></ul><p class="status">unselected</p></div>');
+	  $('#trashcan-contents').find('ul').html('<li>'+deleted_stuff.join('</li><li>')+'</li>')
+		}
+	  });
+
+	$(document).on('click', function() {
+    $( ".selectable" ).draggable();
+     $( "#trashcan" ).draggable();
+	});
+	
+	$(document).on('click', '#start-button', function() {
+	$('#menu').slideToggle();
+	});
+	
+//	$(document).on('mousedown','.selectable',function() {
+//	$('.active').remove();
+//	});
+	
+	$(document).on('click','.selectable',function() {
+		$(this).toggleClass('active');
+	// if this element has the active class, overwrite the inner html
+		if ($(this).hasClass('active')) {
+			$(this).find('p.status').html('this element is active');
+		} else if (!$(this).hasClass('active')) {
+			$(this).find('p.status').html('this element is now inactive');
+		}
+	});
+	</script>
+	<style>
+		body {
+		background: url('background.jpg') fixed no-repeat;
+		background-size: cover;
+		font-family: sans-serif;
+		margin: 0;}
+
+	.selectable.active {background-color:#fff; border: solid 1px aqua; opacity: 1.0;}
+	
+	.iconbutton {
+	margin-left: 0.25em;
+	width: 3em; 
+	height: 3em;
+	}
+
+	.window-titlebar {
+	border: none;
+	height: 1.5em;
+	background-color: lightblue;
+	}
+	
+	.close-button {
+		font-size:1.5em;
+		display: block;
+		float: right;
+		color: white;
+	}
+	
+		.selectable {
+		position: absolute;
+		border: solid 1px lightgray;
+		float: left;
+		background-color: #eee;
+		width: 10em;
+		height: 10em;
+		opacity: 0.8;
+		transition: 0.08s;
+		}
+	.selectable:hover {background-color:lightblue; border: solid aqua 1px; transition: 0.5s;}
+	.selectable:hover .window-titlebar {background-color: aqua; transition: 0.5s;}
+	.selectable p {padding-left: 0.25em;}
+	
+	#taskbar {
+		color: white;
+		position: fixed;
+		background-color:#5555ff;
+		width: 100vw;
+		bottom: 0px;
+		height: 3em;
+		overflow: none;
+		border: none;
+		opacity: 0.7;
+		border-top: solid 1px blue;
+	}
+	
+	#start-button {
+		position:fixed;
+		padding: 1em;
+		text-align: center;
+		max-height:3em;
+		width: 8em;
+		border-right: solid 1px blue;
+		font-weight: bold;
+		background-color: green;
+		left: -1.5em;
+		border-radius: 1.4em;
+	}
+	#start-button:hover{
+		background-color: lightgreen;
+		color: green;
+		border-right: solid 1px green;
+		transition: 0.25s;
+	}
+	
+	#menu {
+		position: absolute;
+		background-color: #5555ff;
+		width: 18em;
+		height: 30em;
+		bottom: 3em;
+		border-bottom: solid 1px black;
+		border-right: solid 1px blue;
+		border-top: solid 1px blue;
+		display: none;
+		opacity: 0.7;
+	}
+	#menu button {
+	background-color: #9999ff;
+	width: 100%;
+	padding: 0.5em;
+	margin-left:0em;
+	border-top: solid 1px blue;
+	border-bottom: solid 1px black;
+	border-left: none;
+	border-right: none;
+	text-align: left;
+	}
+	
+	#menu button:hover {
+	background-color: lightblue;
+	border-top: solid 1px blue;
+	border-bottom: solid 1px blue;
+	color: blue;
+	transition: 0.25s;
+	}
+	
+	#menu h1 {color: darkblue;}
+	
+	#clock {
+	position: fixed;
+	padding: 1em;
+	position: relative;
+	width: 6em;
+	float: right;
+	text-align: center;
+	border-left: solid 1px blue;
+	}
+	
+	#trashcan {
+	position: absolute;
+	bottom: 1em;
+	right: 1em;
+	opacity: 0.7;
+	}
+	
+	#trashcan-contents {
+	width: 40em;
+	overflow: scroll;
+	}
+	
+	.desktop-icon {
+		font-size:5em;
+		padding:0.25em;
+		color: blue;
+	}
+	.desktop-icon:hover {
+		color: aqua;
+	}
+	
+	</style>
+  </head>
+  <body>
+  <i id="trashcan" class="desktop-icon fa fa-trash"></i>
+  <div id="menu">
+  <h1>&nbsp;jQu(indows)</h1>
+  <button id="mk-div">Open pointless window</button>
+  <button id="sel-all">Select all windows</button>
+  <button id="rm-div">Close selected window(s)</button>
+  
+  </div>
+  <div id="taskbar">
+	<div id="start-button"><i class="fa fa-flag-checkered"></i>&nbsp;Start</div>
+	<div id="clock"></div>
+  </div>
+  </body>
+</html>
