@@ -1,105 +1,120 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-    
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<head>
+<meta charset="utf-8">
+<title></title>
 
-    <script src="jquery-3.6.0.min.js">
-	</script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-	<script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="jquery-3.6.0.min.js">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+
 	var num_divs = 0;
+	
 	var time = new Date();
+	
 	deleted_stuff = new Array();
+	
 	selected_windows = new Array();
+	
+	
 	$(document).ready(function() {
-	$('#clock').append(time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }));
 	
-		$('#mk-div').click(function() {
-		//this line prints num_divs to taskbar.
-		//$('#taskbar').append('<div>'+num_divs+'</div>');
-			$('body').append('<div id="'+num_divs+'" class="selectable" style="margin:'+num_divs+'em;"><div class="window-titlebar">'+num_divs+'<i class="close-button fa fa-times"></i><br></div><p></p><p class="status">unselected</p></div>');
-			
-			num_divs += 1;
-		});
-	});
+	  //timestamp appended to #clock div
+	  $('#clock').append(time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }));
 	
-	$(document).on('click','#rm-div',function() {
-	$('.active').remove();
-		
-	for (i=0; i < num_divs; i++) {
-			if ($(this).attr('id') == i){
-			deleted_stuff.push(i);
-			}
-		  };
-	});
-	
-	$(document).on('click','#sel-all',function() {
-	$('.selectable').toggleClass('active');
-	
-	});
-	
-	$(document).on('click','.close-button',function() {
-	$(this).parent().parent().remove();
-	deleted_stuff.push($(this).parent().parent().attr('id'));
-	});
-	
-		  
-	
-	$(document).on('dblclick','#trashcan',function() {
-	// conditional checks if an element with that id is not already present
-		if ($('#trashcan-contents').length === 0) {
-	  $('body').append('<div id="trashcan-contents" class="selectable"><div class="window-titlebar">trashcan<i class="close-button fa fa-times"></i><br></div>Only windows closed with the X button will appear here.</br><ul></ul><p class="status">unselected</p></div>');
-	  $('#trashcan-contents').find('ul').html('<li>'+deleted_stuff.join('</li><li>')+'</li>')
-		}
+	  //#mk-div button appends a new .selectable div aka 'window'
+	  $('#mk-div').click(function() {
+	  
+	    //this line prints num_divs to taskbar. may be used for minimizing later
+	    //$('#taskbar').append('<div>'+num_divs+'</div>');
+	  
+	  $('body').append('<div id="'+num_divs+'" class="selectable" style="margin:'+num_divs+'em;"><div class="window-titlebar">'+num_divs+'<i class="close-button fa fa-times"></i><br></div><p></p><p class="status">unselected</p></div>');
+	      //num_divs is used for window ids
+	      num_divs += 1;
 	  });
+	});
+	
+	
+	//#rm-div button removes anything with .active
+	$(document).on('click','#rm-div',function() {
+	  $('.active').remove();
+	});
+	
+	//#sel-all button adds .active to anything with .selectable
+	$(document).on('click','#sel-all',function() {
+	  $('.selectable').toggleClass('active');
+	});
+	
+	//.close-button will close its parent .selectable
+	$(document).on('click','.close-button',function() {
+	  $(this).parent().parent().remove();
+	  deleted_stuff.push($(this).parent().parent().attr('id'));
+	});
+	
+	//double clicking the #trashcan will open a #trashcan-contents window
+	//if one isn't already open
+	$(document).on('dblclick','#trashcan',function() {
+	  // conditional checks if an element with that id is not already present
+	  if ($('#trashcan-contents').length === 0) {
+	    $('body').append('<div id="trashcan-contents" class="selectable"><div class="window-titlebar">trashcan<i class="close-button fa fa-times"></i><br></div>Only windows closed with the X button will appear here.</br><ul></ul><p class="status">unselected</p></div>');
+	    $('#trashcan-contents').find('ul').html('<li>'+deleted_stuff.join('</li><li>')+'</li>')
+	  }
+	});
 
+	//when an element in document is clicked with .selectable or #trashcan (or others in future)
+	//enables the mouse drag functionality
 	$(document).on('click', function() {
-    $( ".selectable" ).draggable();
-     $( "#trashcan" ).draggable();
+	  $( ".selectable" ).draggable();
+	  $( "#trashcan" ).draggable();
 	});
 	
+	//when #start-button is clicked, the #menu div slides up
 	$(document).on('click', '#start-button', function() {
-	$('#menu').slideToggle();
+	  $('#menu').slideToggle();
 	});
 	
-//	$(document).on('mousedown','.selectable',function() {
-//	$('.active').remove();
-//	});
-	
+	//if a .selectable element is clicked, .active is added
 	$(document).on('click','.selectable',function() {
-		$(this).toggleClass('active');
-	// if this element has the active class, overwrite the inner html
-		if ($(this).hasClass('active')) {
-			$(this).find('p.status').html('this element is active');
-		} else if (!$(this).hasClass('active')) {
-			$(this).find('p.status').html('this element is now inactive');
-		}
+	  $(this).toggleClass('active');
+	  // if this element has the active class, overwrite the inner html
+	  if ($(this).hasClass('active')) {
+	    $(this).find('p.status').html('this element is active');
+	  } else if (!$(this).hasClass('active')) {
+	    $(this).find('p.status').html('this element is now inactive');
+	  }
 	});
-	</script>
-	<style>
-		body {
+	
+</script>
+<style>
+
+	body {
 		background: url('background.jpg') fixed no-repeat;
 		background-size: cover;
 		font-family: sans-serif;
-		margin: 0;}
+		margin: 0;
+	}
 
-	.selectable.active {background-color:#fff; border: solid 1px aqua; opacity: 1.0;}
+	.selectable.active {
+		background-color:#fff;
+		border: solid 1px aqua; 
+		opacity: 1.0;
+	}
 	
 	.iconbutton {
-	margin-left: 0.25em;
-	width: 3em; 
-	height: 3em;
+		margin-left: 0.25em;
+		width: 3em; 
+		height: 3em;
 	}
 
 	.window-titlebar {
-	border: none;
-	height: 1.5em;
-	background-color: lightblue;
+		border: none;
+		height: 1.5em;
+		background-color: lightblue;
 	}
 	
 	.close-button {
@@ -109,7 +124,7 @@
 		color: white;
 	}
 	
-		.selectable {
+	.selectable {
 		position: absolute;
 		border: solid 1px lightgray;
 		float: left;
@@ -118,9 +133,19 @@
 		height: 10em;
 		opacity: 0.8;
 		transition: 0.08s;
-		}
-	.selectable:hover {background-color:lightblue; border: solid aqua 1px; transition: 0.5s;}
-	.selectable:hover .window-titlebar {background-color: aqua; transition: 0.5s;}
+	}
+	
+	.selectable:hover {
+		background-color:lightblue; 
+		border: solid aqua 1px; 
+		transition: 0.5s;
+	}
+	
+	.selectable:hover .window-titlebar {
+		background-color: aqua; 
+		transition: 0.5s;
+	}
+	
 	.selectable p {padding-left: 0.25em;}
 	
 	#taskbar {
@@ -148,6 +173,7 @@
 		left: -1.5em;
 		border-radius: 1.4em;
 	}
+
 	#start-button:hover{
 		background-color: lightgreen;
 		color: green;
@@ -167,48 +193,49 @@
 		display: none;
 		opacity: 0.7;
 	}
+
 	#menu button {
-	background-color: #9999ff;
-	width: 100%;
-	padding: 0.5em;
-	margin-left:0em;
-	border-top: solid 1px blue;
-	border-bottom: solid 1px black;
-	border-left: none;
-	border-right: none;
-	text-align: left;
+		background-color: #9999ff;
+		width: 100%;
+		padding: 0.5em;
+		margin-left:0em;
+		border-top: solid 1px blue;
+		border-bottom: solid 1px black;
+		border-left: none;
+		border-right: none;
+		text-align: left;
 	}
 	
 	#menu button:hover {
-	background-color: lightblue;
-	border-top: solid 1px blue;
-	border-bottom: solid 1px blue;
-	color: blue;
-	transition: 0.25s;
+		background-color: lightblue;
+		border-top: solid 1px blue;
+		border-bottom: solid 1px blue;
+		color: blue;
+		transition: 0.25s;
 	}
 	
 	#menu h1 {color: darkblue;}
 	
 	#clock {
-	position: fixed;
-	padding: 1em;
-	position: relative;
-	width: 6em;
-	float: right;
-	text-align: center;
-	border-left: solid 1px blue;
+		position: fixed;
+		padding: 1em;
+		position: relative;
+		width: 6em;
+		float: right;
+		text-align: center;
+		border-left: solid 1px blue;
 	}
 	
 	#trashcan {
-	position: absolute;
-	bottom: 1em;
-	right: 1em;
-	opacity: 0.7;
+		position: absolute;
+		bottom: 1em;
+		right: 1em;
+		opacity: 0.7;
 	}
 	
 	#trashcan-contents {
-	width: 40em;
-	overflow: scroll;
+		width: 40em;
+		overflow: scroll;
 	}
 	
 	.desktop-icon {
@@ -221,19 +248,21 @@
 	}
 	
 	</style>
-  </head>
-  <body>
-  <i id="trashcan" class="desktop-icon fa fa-trash"></i>
-  <div id="menu">
-  <h1>&nbsp;jQu(indows)</h1>
-  <button id="mk-div">Open pointless window</button>
-  <button id="sel-all">Select all windows</button>
-  <button id="rm-div">Close selected window(s)</button>
-  
-  </div>
-  <div id="taskbar">
-	<div id="start-button"><i class="fa fa-flag-checkered"></i>&nbsp;Start</div>
-	<div id="clock"></div>
-  </div>
-  </body>
+</head>
+<body>
+
+	<i id="trashcan" class="desktop-icon fa fa-trash"></i>
+	
+	<div id="menu">
+		<h1>&nbsp;jQu(indows)</h1>
+		<button id="mk-div">Open pointless window</button>
+		<button id="sel-all">Select all windows</button>
+		<button id="rm-div">Close selected window(s)</button>
+	</div>
+	
+	<div id="taskbar">
+		<div id="start-button"><i class="fa fa-flag-checkered"></i>&nbsp;Start</div>
+		<div id="clock"></div>
+	</div>
+	</body>
 </html>
